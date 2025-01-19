@@ -52,8 +52,6 @@ class NetworkManager {
     
     //MARK: - ** Option 2: Network call with result type
     
-
-    
     func networkCallWithResultType(completion: @escaping (Result<[Person], PersonError>) -> Void) {
         guard let apiURL = URL(string: baseURL) else { return }
         
@@ -84,6 +82,23 @@ class NetworkManager {
             }
         }
         task.resume()
+    }
+    
+    
+    //MARK: - ** Option 3: Network call with ASync
+    
+    func networkWithASync() async throws -> [Person] {
+        guard let apiURL = URL(string: baseURL) else { return [] }
+        
+        let (data, httpResponse) = try await URLSession.shared.data(from: apiURL)
+        
+        guard let httpResponse = httpResponse as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            return []
+        }
+        
+        let decoder = JSONDecoder()
+        let response = try decoder.decode(GetPeopleListResponse.self, from: data)
+        return response.results
     }
 }
 

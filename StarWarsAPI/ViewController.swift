@@ -17,6 +17,9 @@ class ViewController: UIViewController {
         configureTable()
         fetchDataStandard()
         fetchDataResultType()
+        Task {
+            await fetchDataASync()
+        }
     }
 
     private func configureTable() {
@@ -57,6 +60,20 @@ class ViewController: UIViewController {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    private func fetchDataASync() async {
+        
+        do {
+            let pple = try? await NetworkManager.shared.networkWithASync()
+            self.people.append(contentsOf: pple?.map(\.name) ?? [])
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        
     }
 }
 
